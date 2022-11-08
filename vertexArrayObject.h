@@ -22,3 +22,4 @@ private:
     unsigned int vbo;
     unsigned int ebo;
 };
+
