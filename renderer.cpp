@@ -14,3 +14,10 @@ void Renderer::draw2D(Shader& shader, Shape2D& Shape2D)
         glDrawElements(GL_TRIANGLES, Shape2D.get_ebo_indices(), GL_UNSIGNED_INT, 0);
     }
 }
+
+void Renderer::draw3D(Shader& shader, Shape3D& shape)
+{
+    shader.use_shader();
+    shape.bind_vao();
+    glDrawElements(GL_TRIANGLES, shape.get_number_of_indices(), GL_UNSIGNED_INT, 0);
+}
