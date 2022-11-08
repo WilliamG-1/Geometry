@@ -6,16 +6,16 @@ Cube::Cube(float s_width)
     float half_side = sideLength/2;
     float vertices[24] = {
         // Front face
-        -half_side, -half_side, 0,  // Bottom Left  (0)
-        -half_side,  half_side, 0,  // Top Left     (1)
-         half_side, -half_side, 0,  // Bottom Right (2)
-         half_side,  half_side, 0,  // Top Right    (3)
+        -half_side, -half_side, half_side,  // Bottom Left  (0)
+        -half_side,  half_side, half_side,  // Top Left     (1)
+         half_side, -half_side, half_side,  // Bottom Right (2)
+         half_side,  half_side, half_side,  // Top Right    (3)
 
          // Back Face 
-        -half_side, -half_side, -sideLength,  // Bottom Left  (4)
-        -half_side,  half_side, -sideLength,  // Top Left     (5)
-         half_side, -half_side, -sideLength,  // Bottom Right (6)
-         half_side,  half_side, -sideLength,  // Top Right    (7)
+        -half_side, -half_side, -half_side,  // Bottom Left  (4)
+        -half_side,  half_side, -half_side,  // Top Left     (5)
+         half_side, -half_side, -half_side,  // Bottom Right (6)
+         half_side,  half_side, -half_side,  // Top Right    (7)
     };
 
     unsigned int indices[] = {
