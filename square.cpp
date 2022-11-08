@@ -2,8 +2,15 @@
 #include <iostream>
 #include "transformations.h"
 
-Square::Square(float in_x, float in_y, float in_side, bool normalized_coords)
+Square::Square(float in_x, float in_y, float in_side, bool normalized_coords, float z)
 {
+    float vertices[12] = {
+        -0.5f, -0.5f, z, // Bottom Left  (0)
+        -0.5f,  0.5f, z, // Top Left     (1)
+         0.5f, -0.5f, z, // Bottom Right (2)
+         0.5f,  0.5f, z  // Top Right    (3)
+
+    };
     std::cout << "Square!" << std::endl;
     x = in_x;
     y = in_y;
