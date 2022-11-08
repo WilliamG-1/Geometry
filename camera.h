@@ -2,20 +2,39 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+enum class CameraDirection
+{
+    FORWARD = 0,
+    BACKWARD = 1,
+    LEFT = 2,
+    RIGHT = 3,
+    UP = 4,
+    DOWN = 5
+};
 
 class PerspectiveCamera
 {
 public:
     PerspectiveCamera(float fov, float screen_width, float screen_height, float near, float far);
+
+    void euler_angle(float phi, float theta);
+    void move(CameraDirection direction, float dt);
+    void update_basis();
     void moveView(glm::vec3 position);
     void recalculate();
 
+    glm::vec3 get_position() const {return position;}
+    glm::vec3 get_front() const {return front;}
+    glm::vec3 get_focus() const {return position + front;}
     glm::mat4 get_projection_view_matrix() {return projectionView;}
 private:
+    float velocity = 30;
+    
     glm::mat4 projection;
     glm::mat4 view;
     glm::mat4 projectionView;
 
+    glm::vec3 front;
     glm::vec3 position;     // Position of our camera
     glm::vec3 focus;        // Position that our camera is lookint at
     glm::vec3 direction;    // Direction vector (Note that it points towards our camera, not the focus)
