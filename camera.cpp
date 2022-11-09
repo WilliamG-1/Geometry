@@ -6,17 +6,13 @@ PerspectiveCamera::PerspectiveCamera(float fov, float screen_width, float screen
     :
     projection(1.0f), view(1.0f), projectionView(1.0f)
 {
-    position = glm::vec3(0.0f, 0.0f, 9.0f);
+    position = glm::vec3(3.0f, 0.0f, 8.0f);
     focus = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    euler_angle(90, 90);
-
-    direction = glm::normalize(position - focus);
-    glm::vec3 u_p(0.0f, 1.0f, 0.0f); // Vector specifying up direction in our world
-    right = glm::normalize(glm::cross(direction, u_p));
+    euler_angle(90, 90); // Starting angle (Straight forwards)
 
     projection = glm::perspective(glm::radians(fov), screen_width/screen_height, near, far);
-    view = glm::lookAt(position, front, glm::vec3(0.0f, 1.0f, 0.0f));
+    view = glm::lookAt(position, position + front, glm::vec3(0.0f, 1.0f, 0.0f));
 
     recalculate();
 }
@@ -24,7 +20,7 @@ PerspectiveCamera::PerspectiveCamera(float fov, float screen_width, float screen
 void PerspectiveCamera::euler_angle(float phi, float theta)
 {
     float p = 1;
-    // Assume lenght of vector is 1 (normalized) so rho (p) is going to be 1 
+    // Assume length of vector is 1 (normalized) so rho (p) is going to be 1 
     // General equations  Here, open gl uses right hand system, but the y is up and the z is forwards
     // x = p * sin(phi) * cos(theta)
     // z = p * sin(phi) * sin(theta)
@@ -38,8 +34,8 @@ void PerspectiveCamera::euler_angle(float phi, float theta)
     front = glm::normalize(front);
 
     // Negate values because the negative axis is "Forwards" in our coordinate system
-    front.x *= -1;
-    front.y *= -1;
+    //front.x *= -1;
+    //front.y *= -1;
     front.z *= -1;
     //std::printf("Direction: (%.2f, %.2f, %.2f)\n", front.x, front.y, front.z);
     update_basis();
@@ -63,6 +59,12 @@ void PerspectiveCamera::move(CameraDirection direction, float dt)
         break;
     case CameraDirection::RIGHT: // Backward
         position += right * dt * velocity;
+        break;
+    case CameraDirection::UP:
+        position += glm::vec3(0.0f, 1.0f, 0.0f) * dt * velocity;
+        break;
+    case CameraDirection::DOWN:
+        position -= glm::vec3(0.0f, 1.0f, 0.0f) * dt * velocity;
         break;
     }
     view = glm::lookAt(position, position + front, glm::vec3(0.0f, 1.0f, 0.0f));
