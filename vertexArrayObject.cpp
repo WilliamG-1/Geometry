@@ -16,7 +16,6 @@ void VertexArrayObject::init_VBO(float* data, int number_of_elements, unsigned i
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * number_of_elements, data, GL_STATIC_DRAW);
-    std::cout << sizeof(data) << std::endl;
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(location);
@@ -43,6 +42,5 @@ void VertexArrayObject::bind()
 
 VertexArrayObject::~VertexArrayObject()
 {
-    std::cout << "vao dtor" << std::endl;
     glDeleteVertexArrays(1, &vao);
 }
