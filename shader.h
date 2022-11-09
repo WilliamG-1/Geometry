@@ -13,6 +13,8 @@ public:
     void use_shader();
 
     void setUniform1f(const char* uniformName, float value);
+    void setUniformVec3fv(const char* uniformName, glm::vec3 vector);
+    void setUniformVec3f(const char* uniformName, float x, float y, float z);
     void setUniformMat4f(const char* uniformName, glm::mat4 matrix);
 private:
     unsigned int program = 0;
