@@ -16,6 +16,7 @@
 				"${workspaceFolder}/*.cpp",
 				"${workspaceFolder}/glad.c",
 				"${workspaceFolder}/dependencies/library/libglfw.3.3.dylib",
+				//"${workspaceFolder}/dependencies/include/Imgui/*.cpp",
 				"-o",
 				"${workspaceFolder}/app",
 				"-framework",
