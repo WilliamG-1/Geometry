@@ -19,9 +19,10 @@ public:
 
     void euler_angle(float phi, float theta);
     void move(CameraDirection direction, float dt);
-    void update_basis();
+    void updateBasis();
     void moveView(glm::vec3 position);
     void recalculate();
+    void panCamera(int phi_direction, int theta_direction, float dt);
 
     glm::vec3 get_position() const {return position;}
     glm::vec3 get_front() const {return front;}
@@ -29,7 +30,10 @@ public:
     glm::mat4 get_projection_view_matrix() {return projectionView;}
 private:
     float velocity = 10;    // Camera speed
-    
+    float pan_speed = 90;   
+    float phi = 95;
+    float theta = 115;
+
     glm::mat4 projection;
     glm::mat4 view;
     glm::mat4 projectionView;
