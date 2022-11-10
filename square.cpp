@@ -11,7 +11,7 @@ Square::Square(float in_x, float in_y, float in_side, bool normalized_coords, fl
          0.5f,  0.5f, z  // Top Right    (3)
 
     };
-    std::cout << "Square!" << std::endl;
+
     x = in_x;
     y = in_y;
     side = in_side;

@@ -19,26 +19,29 @@ public:
 
     void euler_angle(float phi, float theta);
     void move(CameraDirection direction, float dt);
-    void update_basis();
+    void updateBasis();
     void moveView(glm::vec3 position);
     void recalculate();
+    void panCamera(int phi_direction, int theta_direction, float dt);
 
     glm::vec3 get_position() const {return position;}
     glm::vec3 get_front() const {return front;}
     glm::vec3 get_focus() const {return position + front;}
     glm::mat4 get_projection_view_matrix() {return projectionView;}
 private:
-    float velocity = 30;
-    
+    float velocity = 10;    // Camera speed
+    float pan_speed = 90;   
+    float phi = 95;
+    float theta = 115;
+
     glm::mat4 projection;
     glm::mat4 view;
     glm::mat4 projectionView;
 
-    glm::vec3 front;
+    glm::vec3 front;        // Direction vector pointing towards our scene (in front of camera)
     glm::vec3 position;     // Position of our camera
     glm::vec3 focus;        // Position that our camera is lookint at
-    glm::vec3 direction;    // Direction vector (Note that it points towards our camera, not the focus)
-    glm::vec3 right;
+    glm::vec3 right;        // Vector denoting our right axis
     glm::vec3 up;
 };
 

@@ -14,32 +14,24 @@
 #include "transformations.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window);
+void processInput(GLFWwindow *window, PerspectiveCamera& camera);
 int randint(int first, int second);
 void updateDT();
 
-float yMovement = 0.0f;
-float xMovement = 0.0f;
-float zMovement = 9.0f;
+float phi = 115;
+float theta = 95;
+float panSpeed = 80;
+float spec = 32.0f;
 float dt = 0;
 float current = 0;
 float last = 0;
-float rotateAmount = 0.0f;
-float xRotation = 0;
-float yRotation = 0;
-float zRotation = 0;
-float scalar = 1;
-bool rotate = false;
-bool scale = false;
+
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 int main()
 {
-
-    
-
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -50,7 +42,7 @@ int main()
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-
+    
     // glfw window creation
     // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Models", NULL, NULL);
@@ -83,69 +75,59 @@ int main()
         return -1;
     }
 
-    // uncomment this call to draw in wireframe polygons.
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     Shader shader;
+    Shader lightShader;
     shader.init_shaders("shaders/vertex.vert", "shaders/fragment.frag");
+    lightShader.init_shaders("shaders/lightVertex.vert", "shaders/lightFragment.frag");
     Renderer renderer;
-    //OrthographicCamera o_Camera(800.0f, 600.0f);
-    PerspectiveCamera p_Camera(45.0f, 800, 600, 0.1f, 90.0f);
-    p_Camera.moveView(glm::vec3(0.0f, 0.0f, -5.0f));
-    //o_Camera.moveView(glm::vec3(30.0f, -400.0f, 0.0f));
-    
-    Square square(50.0f, 50.0f, 200.0f, true);
-    Square square2(500.0f, 200.0f, 100.0f, true, -5);
-    Cube cube(1.0f);
 
+    PerspectiveCamera p_Camera(45.0f, 800, 600, 0.1f, 90.0f);
+    Cube cube(5.0f);
+    Cube lightCube(1.0f);
+    Transformations::translate3D(lightCube, 6.0f, 9.5f, -12.5f);
     std::vector<Cube> v_Cubes;
-    for (int i = 1; i < 90; i++)
-    {
-        v_Cubes.push_back(Cube(1.0f));
-        Transformations::translate3D(v_Cubes[i - 1].get_model_matrix(), randint(-10, 10), randint(-10, 10), randint(-10, 10));
-        Transformations::rotate3D(v_Cubes[i - 1].get_model_matrix(), i * 10, i * 33, i % 3, glm::vec3(1.0f, 1.0f, 1.0f));
-    }
-    //Cube cube2(3.0f);
-    //shader.setUniformMat4f("u_ViewProjection", o_Camera.get_projection_view_matrix());
-    shader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
-    shader.setUniformMat4f("u_Model", cube.get_model_matrix());
+    // for (int i = 1; i < 90; i++)
+    // {
+    //     v_Cubes.push_back(Cube(1.0f));
+    //     Transformations::translate3D(v_Cubes[i - 1].get_model_matrix(), randint(-10, 10), randint(-10, 10), randint(-15, 0));
+    //     Transformations::rotate3D(v_Cubes[i - 1].get_model_matrix(), i * 10, i * 33, i % 3, glm::vec3(1.0f, 1.0f, 1.0f));
+    // }
+
+    shader.setUniformVec3f("u_ObjectColor", 0.76f, 0.45f, 0.56f);
+    shader.setUniformVec3fv("u_LightColor", glm::vec3(1, 1, 1));
+    shader.setUniformVec3fv("u_LightPosition", lightCube.get_position_vector());
+
     glEnable(GL_DEPTH_TEST);
+    
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
+        
         // input
         // -----
-        processInput(window);
+        processInput(window, p_Camera);
 
         // render
         // ------
-        glClearColor(0.2, 0.39f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        Transformations::rotate3D(cube.get_model_matrix(), xRotation, yRotation, 0, glm::vec3(1.0f, 1.0f, 1.0f)); // This is temrprary lol
-        //shader.setUniformMat4f("u_Model", cube.get_model_matrix());
-        renderer.draw3D(shader, cube);
-        for (Cube& cube : v_Cubes)
-            renderer.draw3D(shader, cube);
-        //Transformations::rotate3D(cube2.get_model_matrix(), square2, 3, xRotation, glm::vec3(0, 1.0f, 0.0f) ); // This is temrprary lol
-        //shader.setUniformMat4f("u_Model", cube2.get_model_matrix());
-        //renderer.draw3D(shader, cube2);
-
-        p_Camera.moveView(glm::vec3(xMovement, yMovement, zMovement));
+        shader.setUniform1f("u_SpecExponent", spec);
+        shader.setUniformVec3fv("u_ViewPosition", p_Camera.get_position());
         shader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
+        renderer.draw3D(shader, cube);
 
-        // Transformations::rotate3D(square.get_model(), square, square.get_side(), xRotation, glm::vec3(1, 0.0f, 0.0f));
-        // shader.setUniformMat4f("u_Model", square.get_model());
-        // renderer.draw2D(shader, square);
-
-        // //Transformations::rotate2D(square2.get_model(), square2, square2.get_side(), rotateAmount);
-        // shader.setUniformMat4f("u_Model", square2.get_model());
-        // renderer.draw2D(shader, square2);
+        //Transformations::translate3D(lightCube, dt * cos(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7);
+        shader.setUniformVec3fv("u_LightPosition", lightCube.get_position_vector());
+        lightShader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
+        renderer.draw3D(lightShader, lightCube);
+        // for (Cube& cube : v_Cubes)
+        //     renderer.draw3D(shader, cube);
         
-        xRotation = 0;
-        yRotation = 0;
+        //std::printf("Camera: (%.2f, %.2f, %.2f)\n", p_Camera.get_position().x, p_Camera.get_position().y, p_Camera.get_position().z);
+
         updateDT();
+        
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
@@ -155,45 +137,58 @@ int main()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
+
     return 0;
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
+void processInput(GLFWwindow *window, PerspectiveCamera& camera)
 {
     // Camera movement 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        xMovement -= 5 * dt;
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        xMovement += 5 * dt;
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        zMovement -= 5 * dt;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        zMovement += 5 * dt;
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        yMovement += 5 * dt;   
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        yMovement -= 5 * dt;   
 
+    // Camera Movement
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.move(CameraDirection::LEFT, dt);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.move(CameraDirection::RIGHT, dt);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.move(CameraDirection::FORWARD, dt);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.move(CameraDirection::BACKWARD, dt);   
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        camera.move(CameraDirection::UP, dt);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        camera.move(CameraDirection::DOWN, dt);
 
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
     {
-        yRotation = -90.5 * dt;
+        camera.panCamera(0, -1, dt);
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
     {
-        yRotation = 90.5 * dt;
+        camera.panCamera(0, 1, dt);
     }
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
     {
-        xRotation = -90.5 * dt;     
+        camera.panCamera(1, 0, dt);
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
     {
-        xRotation = 90.5 * dt;
+        camera.panCamera(-1, 0, dt);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS){
+        spec += dt * 60;
+        if(spec > 256)
+            spec = 256;
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS){
+        spec -= dt * 60;
+        if (spec < 1)
+        spec = 1;
     }
         
 }

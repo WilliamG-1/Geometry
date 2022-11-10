@@ -9,9 +9,9 @@ public:
     ~VertexArrayObject();
     void bind();
     void init();
-    void init_VBO(float* data, int number_of_elements, unsigned int location, unsigned int count, unsigned int stride, int offset);
+    void init_VBO(float* data, int number_of_elements, unsigned int location, unsigned int count_per_vertices, unsigned int stride, int offset);
     void init_EBO(unsigned int* data, int number_of_elements);
-    void set_vertex_attrib_pointer(unsigned int location, unsigned int count, unsigned int stride, int offset);
+    void set_vertex_attrib_pointer(float* data, int number_of_elements, unsigned int location, unsigned int count_per_vertices, unsigned int stride, int offset);
      float vertices[9] = {
          -0.5f, -0.5f, 0.0f, // left  
           0.5f, -0.5f, 0.0f, // right 
@@ -22,4 +22,5 @@ private:
     unsigned int vbo;
     unsigned int ebo;
 };
+
 

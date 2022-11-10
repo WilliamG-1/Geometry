@@ -1,4 +1,5 @@
 #include "transformations.h"
+#include <iostream>
 
 void Transformations::rotate2D(glm::mat4& model, Shape2D& shape, float width, float degrees)
 {
@@ -13,15 +14,16 @@ void Transformations::scale(glm::mat4& model, Shape2D& shape, float width, float
 }
 
 
-void Transformations::translate3D(glm::mat4& model, float xTranslate, float yTranslate, float zTranslate)
+void Transformations::translate3D(Shape3D& shape, float xTranslate, float yTranslate, float zTranslate)
 {
-    model = glm::translate(model, glm::vec3(xTranslate, yTranslate, zTranslate));
+    shape.get_model_matrix() = glm::translate(shape.get_model_matrix(), glm::vec3(xTranslate, yTranslate, zTranslate));
+    shape.get_position_vector() += glm::vec3(xTranslate, yTranslate, zTranslate);
 }
 
-void Transformations::rotate3D(glm::mat4& model, float xRotation, float yRotation, float zRotation, glm::vec3 axes)
+void Transformations::rotate3D(Shape3D& shape, float xRotation, float yRotation, float zRotation, glm::vec3 axes)
 {
    
-    model = glm::rotate(model, glm::radians(xRotation), glm::vec3(axes.x, 0.0f, 0.0f)) *  
+    shape.get_model_matrix() = glm::rotate(shape.get_model_matrix(), glm::radians(xRotation), glm::vec3(axes.x, 0.0f, 0.0f)) *  
             glm::rotate(glm::mat4(1.0f), glm::radians(yRotation), glm::vec3(0.0f, axes.y, 0.0f)) *
             glm::rotate(glm::mat4(1.0f), glm::radians(zRotation), glm::vec3(0.0f, 0.0f, axes.z));
 }
