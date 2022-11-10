@@ -18,10 +18,10 @@ void processInput(GLFWwindow *window, PerspectiveCamera& camera);
 int randint(int first, int second);
 void updateDT();
 
-float phi = 90;
-float theta = 90;
+float phi = 115;
+float theta = 95;
 float panSpeed = 80;
-
+float spec = 32.0f;
 float dt = 0;
 float current = 0;
 float last = 0;
@@ -42,7 +42,7 @@ int main()
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-
+    
     // glfw window creation
     // --------------------
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Models", NULL, NULL);
@@ -82,9 +82,9 @@ int main()
     Renderer renderer;
 
     PerspectiveCamera p_Camera(45.0f, 800, 600, 0.1f, 90.0f);
-    Cube cube(1.0f);
+    Cube cube(5.0f);
     Cube lightCube(1.0f);
-    Transformations::translate3D(lightCube.get_model_matrix(), 2.0f, 0.0f, -7.0f);
+    Transformations::translate3D(lightCube, 6.0f, 9.5f, -12.5f);
     std::vector<Cube> v_Cubes;
     // for (int i = 1; i < 90; i++)
     // {
@@ -93,33 +93,41 @@ int main()
     //     Transformations::rotate3D(v_Cubes[i - 1].get_model_matrix(), i * 10, i * 33, i % 3, glm::vec3(1.0f, 1.0f, 1.0f));
     // }
 
-    shader.setUniformVec3f("u_ObjectColor", 1, 1, 1);
-    shader.setUniformVec3fv("u_LightColor", glm::vec3(0.15f, 0.27f, 0.324));
+    shader.setUniformVec3f("u_ObjectColor", 0.76f, 0.45f, 0.56f);
+    shader.setUniformVec3fv("u_LightColor", glm::vec3(1, 1, 1));
+    shader.setUniformVec3fv("u_LightPosition", lightCube.get_position_vector());
+
     glEnable(GL_DEPTH_TEST);
+    
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
+        
         // input
         // -----
         processInput(window, p_Camera);
 
         // render
         // ------
-        glClearColor(0.2, 0.39f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        shader.setUniform1f("u_SpecExponent", spec);
+        shader.setUniformVec3fv("u_ViewPosition", p_Camera.get_position());
         shader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
-        lightShader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
-
         renderer.draw3D(shader, cube);
+
+        //Transformations::translate3D(lightCube, dt * cos(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7);
+        shader.setUniformVec3fv("u_LightPosition", lightCube.get_position_vector());
+        lightShader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
         renderer.draw3D(lightShader, lightCube);
         // for (Cube& cube : v_Cubes)
         //     renderer.draw3D(shader, cube);
         
-        std::printf("Camera: (%.2f, %.2f, %.2f)\n", p_Camera.get_position().x, p_Camera.get_position().y, p_Camera.get_position().z);
+        //std::printf("Camera: (%.2f, %.2f, %.2f)\n", p_Camera.get_position().x, p_Camera.get_position().y, p_Camera.get_position().z);
 
         updateDT();
+        
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
@@ -129,6 +137,7 @@ int main()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
+
     return 0;
 }
 
@@ -156,27 +165,30 @@ void processInput(GLFWwindow *window, PerspectiveCamera& camera)
 
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
     {
-        theta += panSpeed *  dt;
-        camera.euler_angle(phi, theta);
+        camera.panCamera(0, -1, dt);
     }
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
     {
-        theta -= panSpeed * dt;
-        camera.euler_angle(phi, theta);
+        camera.panCamera(0, 1, dt);
     }
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
     {
-        phi -= panSpeed * dt;
-        if (phi > 179)
-            phi = 179; 
-        camera.euler_angle(phi, theta); 
+        camera.panCamera(1, 0, dt);
     }
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
     {
-        phi += panSpeed * dt;
-        if (phi < 1)
-            phi = 1;
-        camera.euler_angle(phi, theta);
+        camera.panCamera(-1, 0, dt);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS){
+        spec += dt * 60;
+        if(spec > 256)
+            spec = 256;
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS){
+        spec -= dt * 60;
+        if (spec < 1)
+        spec = 1;
     }
         
 }
