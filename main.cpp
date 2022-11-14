@@ -86,11 +86,13 @@ int main()
     Cube lightCube(1.0f);
     Transformations::translate3D(lightCube, 9.0f, 3.5f, -6.5f);
     std::vector<Cube> v_Cubes;
+    Material bronze;
+    bronze.ambient = glm::vec3(0.7f, 0.2f, 0.15f);
+    bronze.diffusion = glm::vec3(1.0f, 0.5f, 0.31f);
+    bronze.specular = glm::vec3(0.5f, 0.5f, 0.5f);
+    bronze.shininess = 128.0f;
 
-    shader.setUniformVec3f("u_Material.ambient", 1.0f, 0.5f, 0.31f);
-    shader.setUniformVec3f("u_Material.diffusion", 1.0f, 0.5f, 0.31f);
-    shader.setUniformVec3f("u_Material.specular", 0.5f, 0.5f, 0.5f);
-
+    shader.setUniform1i("u_Material.t_diffuse", 0);
     shader.setUniformVec3f("u_Light.ambient",  0.2f, 0.2f, 0.2f);
     shader.setUniformVec3f("u_Light.diffusion",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
     shader.setUniformVec3f("u_Light.specular", 1.0f, 1.0f, 1.0f);
@@ -116,11 +118,10 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        shader.setUniform1f("u_Material.shininess", spec);
         shader.setUniformVec3fv("u_ViewPosition", p_Camera.get_position());
         shader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
         shader.setUniformVec3fv("u_Light.position", lightCube.get_position_vector());
-        renderer.draw3D(shader, cube);
+        renderer.draw3D(shader, cube, bronze);
 
         //Transformations::translate3D(lightCube, dt * cos(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7);
         
