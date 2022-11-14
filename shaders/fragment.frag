@@ -6,6 +6,7 @@ struct Material{
 
     sampler2D t_diffuse;
     sampler2D t_specular;
+    //sampler2D t_emmission;
     float shininess;
 };
 struct Light{
@@ -14,6 +15,10 @@ struct Light{
     vec3 ambient;
     vec3 diffusion;
     vec3 specular;
+
+    float constant;
+    float linear;
+    float quadratic;
 };
 
 out vec4 FragColor;
@@ -30,13 +35,17 @@ in vec3 Normal;
 in vec2 TexCoords;
 void main()
 {
+    // Attentuation 
+    float distance = length(FragPos - u_Light.position);
+    float attenuation = 1 / (u_Light.constant + u_Light.linear * distance + u_Light.quadratic * pow(distance, 2));
+
     // Ambient lighting strength
     vec3 ambient = u_Light.ambient * vec3(texture(u_Material.t_diffuse, TexCoords));   // Calculate Ambient vector;
 
     // Diffusion Lighting
-    vec3 normal = normalize(Normal);                                  // Normalizes the ... normal vector
+    vec3 normal = normalize(Normal);                                   // Normalizes the ... normal vector
     vec3 lightDirection = normalize(u_Light.position - FragPos);       // Calculate direction vector from surface to light source
-    float diff = max(dot(normal, lightDirection), 0.0);               // Calculate the intnsity of diffusion by taking the dot product between the normal, and the light direction
+    float diff = max(dot(normal, lightDirection), 0.0);                // Calculate the intnsity of diffusion by taking the dot product between the normal, and the light direction
     vec3 diffusion = u_Light.diffusion * diff * vec3(texture(u_Material.t_diffuse, TexCoords)); // Calculate Diffusion Vector
 
     // Specular Lighting
@@ -45,8 +54,10 @@ void main()
     float spec = pow(max(dot(viewDirection, reflectDirection), 0.0f), u_Material.shininess);  // Specular lighting formula (Spec exponent increases intensity)
     vec3 specular = u_Light.specular * spec * vec3(texture(u_Material.t_specular, TexCoords)); // Calculate specular vector
 
+    // Emmission
+    //vec3 emmission = vec3(texture(u_Material.t_emmission, TexCoords));
     // Result
-    vec3 result = ambient + diffusion + specular;
+    vec3 result = attenuation * (ambient + diffusion + specular);
 
     
     FragColor = vec4(result, 1.0f);
