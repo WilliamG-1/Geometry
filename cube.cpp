@@ -1,7 +1,7 @@
 #include "cube.h"
 
 Cube::Cube(float s_width)
-    : texture("Assets/container2.png")
+    //: //texture("Assets/container2.png")
 {
     sideLength = s_width; // <-- Can you be less confusing?? Lol
     float half_side = sideLength/2;

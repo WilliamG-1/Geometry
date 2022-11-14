@@ -10,6 +10,6 @@ public:
     
     void bind_vao();
 private:
-    Texture texture;
+    //Texture texture;
     float sideLength;
 };
