@@ -1,10 +1,25 @@
 #version 330 core
+struct Material{
+    vec3 ambient;
+    vec3 diffusion;
+    vec3 specular;
+
+    float shininess;
+};
+struct Light{
+    vec3 position;
+
+    vec3 ambient;
+    vec3 diffusion;
+    vec3 specular;
+};
 
 out vec4 FragColor;
 
-uniform vec3 u_ObjectColor;
-uniform vec3 u_LightColor;
-uniform vec3 u_LightPosition;
+uniform Material u_Material;
+uniform Light u_Light;
+
+
 uniform vec3 u_ViewPosition;
 
 uniform float u_SpecExponent;
@@ -13,23 +28,23 @@ in vec3 Normal;
 
 void main()
 {
-    float ambient = 0.1; // Ambient lighting strength
+    // Ambient lighting strength
+    vec3 ambient = u_Light.ambient * u_Material.ambient;   // Calculate Ambient vector;
 
+    // Diffusion Lighting
     vec3 normal = normalize(Normal);                                  // Normalizes the ... normal vector
-    vec3 lightDirection = normalize(u_LightPosition - FragPos);       // Calculate direction vector from surface to light source
-    float diffusion = max(dot(normal, lightDirection), 0.0);          // Calculate the intnsity of diffusion by taking the dot product between the normal, and the light direction
+    vec3 lightDirection = normalize(u_Light.position - FragPos);       // Calculate direction vector from surface to light source
+    float diff = max(dot(normal, lightDirection), 0.0);               // Calculate the intnsity of diffusion by taking the dot product between the normal, and the light direction
+    vec3 diffusion = u_Light.diffusion * (diff * u_Material.diffusion); // Calculate Diffusion Vector
 
+    // Specular Lighting
     vec3 viewDirection = normalize(u_ViewPosition - FragPos);         // Calculate the direction vector pointing from surface of object to the camera
     vec3 reflectDirection = reflect(-lightDirection, normal);         // Calculate the reflected direction vector pointing from the surface to outside
+    float spec = pow(max(dot(viewDirection, reflectDirection), 0.0f), u_Material.shininess);  // Specular lighting formula (Spec exponent increases intensity)
+    vec3 specular = u_Light.specular * (spec * u_Material.specular); // Calculate specular vector
 
-    float spec = pow(max(dot(reflectDirection, viewDirection), 0.0f), u_SpecExponent);  // Specular lighting formula (Spec exponent increases intensity)
-    
-    float specularIntensity = 0.5f; // Specular strength factor
-
-    float specular = spec * specularIntensity;  // Calculate overall spec value by multiplying intensity and strenght
-
-    
-    vec3 result = ( ambient + diffusion + specular ) * u_ObjectColor * u_LightColor; // Resulting ambient diffusion and specular values multiplied to the object
+    // Result
+    vec3 result = ambient + diffusion + specular;
 
     
     FragColor = vec4(result, 1.0f);
