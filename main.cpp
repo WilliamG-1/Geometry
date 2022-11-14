@@ -21,7 +21,7 @@ void updateDT();
 float phi = 115;
 float theta = 95;
 float panSpeed = 80;
-float spec = 32.0f;
+float spec = 256.0f;
 float dt = 0;
 float current = 0;
 float last = 0;
@@ -82,22 +82,25 @@ int main()
     Renderer renderer;
 
     PerspectiveCamera p_Camera(45.0f, 800, 600, 0.1f, 90.0f);
-    Cube cube(5.0f);
+    Cube cube(3.0f);
     Cube lightCube(1.0f);
-    Transformations::translate3D(lightCube, 6.0f, 9.5f, -12.5f);
+    Transformations::translate3D(lightCube, 9.0f, 3.5f, -6.5f);
     std::vector<Cube> v_Cubes;
-    // for (int i = 1; i < 90; i++)
-    // {
-    //     v_Cubes.push_back(Cube(1.0f));
-    //     Transformations::translate3D(v_Cubes[i - 1].get_model_matrix(), randint(-10, 10), randint(-10, 10), randint(-15, 0));
-    //     Transformations::rotate3D(v_Cubes[i - 1].get_model_matrix(), i * 10, i * 33, i % 3, glm::vec3(1.0f, 1.0f, 1.0f));
-    // }
 
-    shader.setUniformVec3f("u_ObjectColor", 0.76f, 0.45f, 0.56f);
-    shader.setUniformVec3fv("u_LightColor", glm::vec3(1, 1, 1));
-    shader.setUniformVec3fv("u_LightPosition", lightCube.get_position_vector());
+    shader.setUniformVec3f("u_Material.ambient", 1.0f, 0.5f, 0.31f);
+    shader.setUniformVec3f("u_Material.diffusion", 1.0f, 0.5f, 0.31f);
+    shader.setUniformVec3f("u_Material.specular", 0.5f, 0.5f, 0.5f);
 
+    shader.setUniformVec3f("u_Light.ambient",  0.2f, 0.2f, 0.2f);
+    shader.setUniformVec3f("u_Light.diffusion",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+    shader.setUniformVec3f("u_Light.specular", 1.0f, 1.0f, 1.0f);
+    
+    shader.setUniformVec3fv("u_Light.position", lightCube.get_position_vector());   
+    std::printf("Camera: (%.2f, %.2f, %.2f)", p_Camera.get_position().x, p_Camera.get_position().y, p_Camera.get_position().z);
+    std::printf("Camera: (%.2f, %.2f, %.2f)", lightCube.get_position_vector().x, lightCube.get_position_vector().y, lightCube.get_position_vector().z);
     glEnable(GL_DEPTH_TEST);
+    
+    
     
     // render loop
     // -----------
@@ -112,13 +115,15 @@ int main()
         // ------
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shader.setUniform1f("u_SpecExponent", spec);
+
+        shader.setUniform1f("u_Material.shininess", spec);
         shader.setUniformVec3fv("u_ViewPosition", p_Camera.get_position());
         shader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
+        shader.setUniformVec3fv("u_Light.position", lightCube.get_position_vector());
         renderer.draw3D(shader, cube);
 
         //Transformations::translate3D(lightCube, dt * cos(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7);
-        shader.setUniformVec3fv("u_LightPosition", lightCube.get_position_vector());
+        
         lightShader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
         renderer.draw3D(lightShader, lightCube);
         // for (Cube& cube : v_Cubes)
