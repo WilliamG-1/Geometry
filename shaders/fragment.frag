@@ -5,6 +5,7 @@ struct Material{
     vec3 specular;
 
     sampler2D t_diffuse;
+    sampler2D t_specular;
     float shininess;
 };
 struct Light{
@@ -42,7 +43,7 @@ void main()
     vec3 viewDirection = normalize(u_ViewPosition - FragPos);         // Calculate the direction vector pointing from surface of object to the camera
     vec3 reflectDirection = reflect(-lightDirection, normal);         // Calculate the reflected direction vector pointing from the surface to outside
     float spec = pow(max(dot(viewDirection, reflectDirection), 0.0f), u_Material.shininess);  // Specular lighting formula (Spec exponent increases intensity)
-    vec3 specular = u_Light.specular * (spec * u_Material.specular); // Calculate specular vector
+    vec3 specular = u_Light.specular * spec * vec3(texture(u_Material.t_specular, TexCoords)); // Calculate specular vector
 
     // Result
     vec3 result = ambient + diffusion + specular;
