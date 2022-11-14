@@ -84,7 +84,11 @@ int main()
     PerspectiveCamera p_Camera(45.0f, 800, 600, 0.1f, 90.0f);
     Cube cube(3.0f);
     Cube lightCube(1.0f);
-    Transformations::translate3D(lightCube, 9.0f, 3.5f, -6.5f);
+
+    Texture diffuse("Assets/container2.png", 0);
+    Texture specular("Assets/container2_specular.png", 1);
+
+    Transformations::translate3D(lightCube, 9.0f, 2.5f, -6.5f);
     std::vector<Cube> v_Cubes;
     Material bronze;
     bronze.ambient = glm::vec3(0.7f, 0.2f, 0.15f);
@@ -93,6 +97,8 @@ int main()
     bronze.shininess = 128.0f;
 
     shader.setUniform1i("u_Material.t_diffuse", 0);
+    shader.setUniform1i("u_Material.t_specular", 1);
+    
     shader.setUniformVec3f("u_Light.ambient",  0.2f, 0.2f, 0.2f);
     shader.setUniformVec3f("u_Light.diffusion",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
     shader.setUniformVec3f("u_Light.specular", 1.0f, 1.0f, 1.0f);
