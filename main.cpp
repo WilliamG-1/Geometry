@@ -83,13 +83,24 @@ int main()
 
     PerspectiveCamera p_Camera(45.0f, 800, 600, 0.1f, 90.0f);
     Cube cube(3.0f);
+    std::vector<Cube> v_Cubes;
+    for (int r = 0; r < 20; r++)
+    {
+        for (int c = 0; c < 20; c++)
+        {
+            v_Cubes.push_back(Cube(3.0f));
+            Transformations::translate3D(v_Cubes.back(), c, -2, r);
+        }
+    }
+
     Cube lightCube(1.0f);
 
     Texture diffuse("Assets/container2.png", 0);
     Texture specular("Assets/container2_specular.png", 1);
+    //Texture emmission("Assets/emission.png", 2);
 
-    Transformations::translate3D(lightCube, 9.0f, 2.5f, -6.5f);
-    std::vector<Cube> v_Cubes;
+    Transformations::translate3D(lightCube, 9.0f, 4.5f, -6.5f);
+
     Material bronze;
     bronze.ambient = glm::vec3(0.7f, 0.2f, 0.15f);
     bronze.diffusion = glm::vec3(1.0f, 0.5f, 0.31f);
@@ -98,14 +109,13 @@ int main()
 
     shader.setUniform1i("u_Material.t_diffuse", 0);
     shader.setUniform1i("u_Material.t_specular", 1);
-    
+    //shader.setUniform1i("u_Material.t_emmission", 2);
+
     shader.setUniformVec3f("u_Light.ambient",  0.2f, 0.2f, 0.2f);
     shader.setUniformVec3f("u_Light.diffusion",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
     shader.setUniformVec3f("u_Light.specular", 1.0f, 1.0f, 1.0f);
     
     shader.setUniformVec3fv("u_Light.position", lightCube.get_position_vector());   
-    std::printf("Camera: (%.2f, %.2f, %.2f)", p_Camera.get_position().x, p_Camera.get_position().y, p_Camera.get_position().z);
-    std::printf("Camera: (%.2f, %.2f, %.2f)", lightCube.get_position_vector().x, lightCube.get_position_vector().y, lightCube.get_position_vector().z);
     glEnable(GL_DEPTH_TEST);
     
     
@@ -128,7 +138,10 @@ int main()
         shader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
         shader.setUniformVec3fv("u_Light.position", lightCube.get_position_vector());
         renderer.draw3D(shader, cube, bronze);
-
+        for (Cube& cube : v_Cubes)
+        {
+            renderer.draw3D(shader, cube, bronze);
+        }
         //Transformations::translate3D(lightCube, dt * cos(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7);
         
         lightShader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
@@ -139,7 +152,7 @@ int main()
         //std::printf("Camera: (%.2f, %.2f, %.2f)\n", p_Camera.get_position().x, p_Camera.get_position().y, p_Camera.get_position().z);
 
         updateDT();
-        
+        std::cout << "FPS: " << 1/dt << std::endl;
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
