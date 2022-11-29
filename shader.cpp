@@ -49,6 +49,12 @@ void Shader::use_shader()
     glUseProgram(program);
 }
 
+
+void Shader::setUniform1i(const char* uniformName, int value)
+{
+    glUseProgram(program);
+    glUniform1i(glGetUniformLocation(program, uniformName), value);
+}
 void Shader::setUniform1f(const char * uniformName, float value)
 {  
     glUseProgram(program);

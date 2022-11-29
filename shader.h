@@ -12,6 +12,7 @@ public:
     void init_shaders(const std::string& vertex_file_path, const std::string& fragment_file_path);
     void use_shader();
 
+    void setUniform1i(const char* uniformName, int value);
     void setUniform1f(const char* uniformName, float value);
     void setUniformVec3fv(const char* uniformName, glm::vec3 vector);
     void setUniformVec3f(const char* uniformName, float x, float y, float z);

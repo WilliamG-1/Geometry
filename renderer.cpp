@@ -15,10 +15,25 @@ void Renderer::draw2D(Shader& shader, Shape2D& Shape2D)
     }
 }
 
+void Renderer::draw3D(Shader& shader, Shape3D& shape, Material material)
+{
+    shader.use_shader();
+    shader.setUniformMat4f("u_Model", shape.get_model_matrix());
+
+    shader.setUniformVec3fv("u_Material.ambient", material.ambient);
+    shader.setUniformVec3fv("u_Material.diffusion", material.diffusion);
+    shader.setUniformVec3fv("u_Material.specular", material.specular);
+    shader.setUniform1f("u_Material.shininess", material.shininess);
+
+    shape.bind_vao();
+    glDrawElements(GL_TRIANGLES, shape.get_number_of_indices(), GL_UNSIGNED_INT, 0);
+}
+
 void Renderer::draw3D(Shader& shader, Shape3D& shape)
 {
     shader.use_shader();
     shader.setUniformMat4f("u_Model", shape.get_model_matrix());
+
     shape.bind_vao();
     glDrawElements(GL_TRIANGLES, shape.get_number_of_indices(), GL_UNSIGNED_INT, 0);
 }

@@ -5,6 +5,7 @@
 #include <vector>
 #include <random>
 
+
 #include "shader.h"
 #include "vertexArrayObject.h"
 #include "renderer.h"
@@ -21,7 +22,7 @@ void updateDT();
 float phi = 115;
 float theta = 95;
 float panSpeed = 80;
-float spec = 32.0f;
+float spec = 256.0f;
 float dt = 0;
 float current = 0;
 float last = 0;
@@ -82,23 +83,82 @@ int main()
     Renderer renderer;
 
     PerspectiveCamera p_Camera(45.0f, 800, 600, 0.1f, 90.0f);
-    Cube cube(5.0f);
-    Cube lightCube(1.0f);
-    Transformations::translate3D(lightCube, 6.0f, 9.5f, -12.5f);
+    Cube cube(3.0f);
     std::vector<Cube> v_Cubes;
-    // for (int i = 1; i < 90; i++)
-    // {
-    //     v_Cubes.push_back(Cube(1.0f));
-    //     Transformations::translate3D(v_Cubes[i - 1].get_model_matrix(), randint(-10, 10), randint(-10, 10), randint(-15, 0));
-    //     Transformations::rotate3D(v_Cubes[i - 1].get_model_matrix(), i * 10, i * 33, i % 3, glm::vec3(1.0f, 1.0f, 1.0f));
-    // }
+    for (int r = 0; r < 20; r++)
+    {
+        for (int c = 0; c < 20; c++)
+        {
+            v_Cubes.push_back(Cube(1.0f));
+            Transformations::translate3D(v_Cubes.back(), c, -2, r);
+            if ((c == 0 || c == 19) || (r == 0 || r == 19))
+            {
+                for (int h = 0; h < 9; h++)
+                {
+                    v_Cubes.push_back(Cube(1.0f));
+                    Transformations::translate3D(v_Cubes.back(), c, h - 1, r);
+                    
+                }
+                
+            }
+        }
+    }
+    for (int r = 0; r < 20; r++)
+    {
+        for (int c = 0; c < 20; c++)
+        {
+            v_Cubes.push_back(Cube(1.0f));
+            Transformations::translate3D(v_Cubes.back(), c, 7, r);
+        }
+    }
 
-    shader.setUniformVec3f("u_ObjectColor", 0.76f, 0.45f, 0.56f);
-    shader.setUniformVec3fv("u_LightColor", glm::vec3(1, 1, 1));
-    shader.setUniformVec3fv("u_LightPosition", lightCube.get_position_vector());
 
-    glEnable(GL_DEPTH_TEST);
+    Cube lightCube(1.0f);
     
+    Texture diffuse("assets/container2.png", 0);
+    Texture specular("assets/container2_specular.png", 1);
+    //Texture emmission("Assets/emission.png", 2);
+
+    Transformations::translate3D(lightCube, 1.0f, 6.0f, 1.0f);
+
+    Material bronze;
+    bronze.ambient = glm::vec3(0.7f, 0.2f, 0.15f);
+    bronze.diffusion = glm::vec3(1.0f, 0.5f, 0.31f);
+    bronze.specular = glm::vec3(0.5f, 0.5f, 0.5f);
+    bronze.shininess = 128.0f;
+
+    shader.setUniform1i("u_Material.t_diffuse", 0);
+    shader.setUniform1i("u_Material.t_specular", 1);
+    //shader.setUniform1i("u_Material.t_emmission", 2);
+
+    // ============================= Point Light ======================================== \\
+
+    // shader.setUniformVec3f("u_Light.ambient",  0.2f, 0.2f, 0.2f);
+    // shader.setUniformVec3f("u_Light.diffusion",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+    // shader.setUniformVec3f("u_Light.specular", 1.0f, 1.0f, 1.0f);
+    // shader.setUniformVec3fv("u_Light.position", lightCube.get_position_vector()); 
+    //  // Light Intensity fade
+    // shader.setUniform1f("u_Light.constant", 1);
+    // shader.setUniform1f("u_Light.linear", 0.022);
+    // shader.setUniform1f("u_Light.quadratic", 0.0019f);
+
+    // ================== SpotLight========================= \\
+
+    shader.setUniformVec3f("u_Spotlight.ambient",  0.2f, 0.2f, 0.2f);
+    shader.setUniformVec3f("u_Spotlight.diffusion",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+    shader.setUniformVec3f("u_Spotlight.specular", 1.0f, 1.0f, 1.0f);
+
+    shader.setUniformVec3fv("u_Spotlight.position", p_Camera.get_position());
+    shader.setUniformVec3fv("u_Spotlight.direction", p_Camera.get_front());
+    shader.setUniform1f("u_Spotlight.cutoff", glm::cos(glm::radians(10.0f)));
+    shader.setUniform1f("u_Spotlight.outerCutoff", glm::cos(glm::radians(17.0f)));
+
+    shader.setUniform1f("u_Spotlight.constant", 1);
+    shader.setUniform1f("u_Spotlight.linear", 0.022);
+    shader.setUniform1f("u_Spotlight.quadratic", 0.0019);
+  
+    glEnable(GL_DEPTH_TEST);
+       
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -112,22 +172,29 @@ int main()
         // ------
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        shader.setUniform1f("u_SpecExponent", spec);
+
         shader.setUniformVec3fv("u_ViewPosition", p_Camera.get_position());
         shader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
-        renderer.draw3D(shader, cube);
+        //shader.setUniformVec3fv("u_Light.direction", lightCube.get_position_vector());
 
+        //SpotLight
+        shader.setUniformVec3fv("u_Spotlight.position", p_Camera.get_position());
+        shader.setUniformVec3fv("u_Spotlight.direction", p_Camera.get_front());
+        renderer.draw3D(shader, cube, bronze);
+        for (Cube& cube : v_Cubes)
+        {
+            renderer.draw3D(shader, cube, bronze);
+        }
         //Transformations::translate3D(lightCube, dt * cos(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7);
-        shader.setUniformVec3fv("u_LightPosition", lightCube.get_position_vector());
+        
         lightShader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
-        renderer.draw3D(lightShader, lightCube);
-        // for (Cube& cube : v_Cubes)
-        //     renderer.draw3D(shader, cube);
+        //renderer.draw3D(lightShader, lightCube);
         
         //std::printf("Camera: (%.2f, %.2f, %.2f)\n", p_Camera.get_position().x, p_Camera.get_position().y, p_Camera.get_position().z);
 
         updateDT();
-        
+        //std::cout << "FPS: " << 1/dt << std::endl;
+        //std::cout << "Hello" << std::endl;
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);

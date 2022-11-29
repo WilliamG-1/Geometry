@@ -47,6 +47,10 @@ void PerspectiveCamera::euler_angle(float phi, float theta)
 void PerspectiveCamera::panCamera(int phi_direction, int theta_direction, float dt)
 {
     phi -= phi_direction * dt * pan_speed;
+    if (phi < 1)
+        phi = 1;
+    if (phi > 179)
+        phi = 179;
     theta -= theta_direction * dt * pan_speed;
     euler_angle(phi, theta);
 }

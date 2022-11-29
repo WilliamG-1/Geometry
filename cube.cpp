@@ -1,6 +1,7 @@
 #include "cube.h"
 
 Cube::Cube(float s_width)
+    //: //texture("Assets/container2.png")
 {
     sideLength = s_width; // <-- Can you be less confusing?? Lol
     float half_side = sideLength/2;
@@ -25,41 +26,41 @@ Cube::Cube(float s_width)
          0.0f, 0.0f, -half_side           , 0, 0, -1.0f
     };
     float nVertices[] {
-        // Front Face
-        -half_side, -half_side, half_side, 0.0f, 0.0f,  1.0f, // (0)
-        -half_side,  half_side, half_side, 0.0f, 0.0f,  1.0f, 
-         half_side, -half_side, half_side, 0.0f, 0.0f,  1.0f,
-         half_side,  half_side, half_side, 0.0f, 0.0f,  1.0f,
+        // Front Face                      Normal Vector        Texture Coordinates
+        -half_side, -half_side, half_side, 0.0f, 0.0f,  1.0f,   0.0f, 0.0f,          // (0)
+        -half_side,  half_side, half_side, 0.0f, 0.0f,  1.0f,   0.0f, 1.0f,
+         half_side, -half_side, half_side, 0.0f, 0.0f,  1.0f,   1.0f, 0.0f,
+         half_side,  half_side, half_side, 0.0f, 0.0f,  1.0f,   1.0f, 1.0f,
 
         // Top Face
-        -half_side, half_side,  half_side, 0.0f,  1.0f, 0.0f, // (4)
-        -half_side, half_side, -half_side, 0.0f,  1.0f, 0.0f,
-         half_side, half_side,  half_side, 0.0f,  1.0f, 0.0f,
-         half_side, half_side, -half_side, 0.0f,  1.0f, 0.0f,
+        -half_side, half_side,  half_side, 0.0f,  1.0f, 0.0f,   0.0f, 1.0f,         // (4)
+        -half_side, half_side, -half_side, 0.0f,  1.0f, 0.0f,   0.0f, 0.0f,
+         half_side, half_side,  half_side, 0.0f,  1.0f, 0.0f,   1.0f, 1.0f,
+         half_side, half_side, -half_side, 0.0f,  1.0f, 0.0f,   1.0f, 0.0f,
 
         // Right Face
-        half_side,  half_side,  half_side,  1.0f, 0.0f, 0.0f, // (8)
-        half_side,  half_side, -half_side,  1.0f, 0.0f, 0.0f,
-        half_side, -half_side,  half_side,  1.0f, 0.0f, 0.0f,
-        half_side, -half_side, -half_side,  1.0f, 0.0f, 0.0f,
+        half_side,  half_side,  half_side,  1.0f, 0.0f, 0.0f,   1.0f, 1.0f,        // (8)
+        half_side,  half_side, -half_side,  1.0f, 0.0f, 0.0f,   1.0f, 0.0f,
+        half_side, -half_side,  half_side,  1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
+        half_side, -half_side, -half_side,  1.0f, 0.0f, 0.0f,   0.0f, 0.0f,
 
         // Back Face
-        -half_side, -half_side, -half_side, 0.0f, 0.0f, -1.0f, // (12)
-        -half_side,  half_side, -half_side, 0.0f, 0.0f, -1.0f,
-         half_side, -half_side, -half_side, 0.0f, 0.0f, -1.0f,
-         half_side,  half_side, -half_side, 0.0f, 0.0f, -1.0f,
+        -half_side, -half_side, -half_side, 0.0f, 0.0f, -1.0f,  0.0f, 0.0f,        // (12)
+        -half_side,  half_side, -half_side, 0.0f, 0.0f, -1.0f,  1.0f, 1.0f,
+         half_side, -half_side, -half_side, 0.0f, 0.0f, -1.0f,  1.0f, 0.0f,
+         half_side,  half_side, -half_side, 0.0f, 0.0f, -1.0f,  1.0f, 1.0f,
 
         // Bottom Face
-        -half_side, -half_side,  half_side, 0.0f, -1.0f, 0.0f, // (16)
-        -half_side, -half_side, -half_side, 0.0f, -1.0f, 0.0f,
-         half_side, -half_side,  half_side, 0.0f, -1.0f, 0.0f,
-         half_side, -half_side, -half_side, 0.0f, -1.0f, 0.0f,
+        -half_side, -half_side,  half_side, 0.0f, -1.0f, 0.0f,  0.0f, 1.0f,         // (16)
+        -half_side, -half_side, -half_side, 0.0f, -1.0f, 0.0f,  0.0f, 0.0f,
+         half_side, -half_side,  half_side, 0.0f, -1.0f, 0.0f,  1.0f, 1.0f,
+         half_side, -half_side, -half_side, 0.0f, -1.0f, 0.0f,  1.0f, 0.0f,
 
         // Left Face
-        -half_side,  half_side,  half_side, -1.0f, 0.0f, 0.0f, // (20)
-        -half_side,  half_side, -half_side, -1.0f, 0.0f, 0.0f,
-        -half_side, -half_side,  half_side, -1.0f, 0.0f, 0.0f,
-        -half_side, -half_side, -half_side, -1.0f, 0.0f, 0.0f,
+        -half_side,  half_side,  half_side, -1.0f, 0.0f, 0.0f,  1.0f, 1.0f,         // (20)
+        -half_side,  half_side, -half_side, -1.0f, 0.0f, 0.0f,  1.0f, 0.0f,
+        -half_side, -half_side,  half_side, -1.0f, 0.0f, 0.0f,  0.0f, 1.0f,
+        -half_side, -half_side, -half_side, -1.0f, 0.0f, 0.0f,  0.0f, 0.0f
 
     };
 
@@ -80,8 +81,9 @@ Cube::Cube(float s_width)
         20, 21, 22,   21, 22, 23
     };
 
-    vao.init_VBO(nVertices, sizeof(nVertices)/sizeof(float), 0, 3, 6, 0);
-    vao.set_vertex_attrib_pointer(nVertices, sizeof(nVertices)/sizeof(float), 1, 3, 6, 3);
+    vao.init_VBO(nVertices, sizeof(nVertices)/sizeof(float), 0, 3, 8, 0);
+    vao.set_vertex_attrib_pointer(nVertices, sizeof(nVertices)/sizeof(float), 1, 3, 8, 3);
+    vao.set_vertex_attrib_pointer(nVertices, sizeof(nVertices)/sizeof(float), 2, 2, 8, 6);
     vao.init_EBO(nIndices, 36);
     position = glm::vec3(0, 0, 0);
 }   

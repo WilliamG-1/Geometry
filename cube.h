@@ -1,5 +1,6 @@
 #pragma once
 #include "shape3D.h"
+#include "texture.h"
 
 class Cube : public Shape3D
 {
@@ -9,5 +10,6 @@ public:
     
     void bind_vao();
 private:
+    //Texture texture;
     float sideLength;
 };
