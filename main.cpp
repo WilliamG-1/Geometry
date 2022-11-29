@@ -4,9 +4,7 @@
 #include <math.h>
 #include <vector>
 #include <random>
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
+
 
 #include "shader.h"
 #include "vertexArrayObject.h"
@@ -91,7 +89,7 @@ int main()
     {
         for (int c = 0; c < 20; c++)
         {
-            v_Cubes.push_back(Cube(3.0f));
+            v_Cubes.push_back(Cube(1.0f));
             Transformations::translate3D(v_Cubes.back(), c, -2, r);
             if ((c == 0 || c == 19) || (r == 0 || r == 19))
             {
@@ -117,11 +115,11 @@ int main()
 
     Cube lightCube(1.0f);
     
-    Texture diffuse("Assets/container2.png", 0);
-    Texture specular("Assets/container2_specular.png", 1);
+    Texture diffuse("assets/container2.png", 0);
+    Texture specular("assets/container2_specular.png", 1);
     //Texture emmission("Assets/emission.png", 2);
 
-    Transformations::translate3D(lightCube, 9.0f, 1.0f, 9.0f);
+    Transformations::translate3D(lightCube, 1.0f, 6.0f, 1.0f);
 
     Material bronze;
     bronze.ambient = glm::vec3(0.7f, 0.2f, 0.15f);
@@ -135,14 +133,14 @@ int main()
 
     // ============================= Point Light ======================================== \\
 
-    shader.setUniformVec3f("u_Light.ambient",  0.2f, 0.2f, 0.2f);
-    shader.setUniformVec3f("u_Light.diffusion",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
-    shader.setUniformVec3f("u_Light.specular", 1.0f, 1.0f, 1.0f);
-     shader.setUniformVec3fv("u_Light.position", lightCube.get_position_vector()); 
-     // Light Intensity fade
-    shader.setUniform1f("u_Light.constant", 1);
-    shader.setUniform1f("u_Light.linear", 0.022);
-    shader.setUniform1f("u_Light.quadratic", 0.0019f);
+    // shader.setUniformVec3f("u_Light.ambient",  0.2f, 0.2f, 0.2f);
+    // shader.setUniformVec3f("u_Light.diffusion",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+    // shader.setUniformVec3f("u_Light.specular", 1.0f, 1.0f, 1.0f);
+    // shader.setUniformVec3fv("u_Light.position", lightCube.get_position_vector()); 
+    //  // Light Intensity fade
+    // shader.setUniform1f("u_Light.constant", 1);
+    // shader.setUniform1f("u_Light.linear", 0.022);
+    // shader.setUniform1f("u_Light.quadratic", 0.0019f);
 
     // ================== SpotLight========================= \\
 
@@ -152,21 +150,15 @@ int main()
 
     shader.setUniformVec3fv("u_Spotlight.position", p_Camera.get_position());
     shader.setUniformVec3fv("u_Spotlight.direction", p_Camera.get_front());
-    shader.setUniform1f("u_Spotlight.cutoff", glm::cos(glm::radians(8.0f)));
+    shader.setUniform1f("u_Spotlight.cutoff", glm::cos(glm::radians(10.0f)));
     shader.setUniform1f("u_Spotlight.outerCutoff", glm::cos(glm::radians(17.0f)));
 
     shader.setUniform1f("u_Spotlight.constant", 1);
     shader.setUniform1f("u_Spotlight.linear", 0.022);
     shader.setUniform1f("u_Spotlight.quadratic", 0.0019);
-
-     
-
-    
+  
     glEnable(GL_DEPTH_TEST);
-    
-    Assimp::Importer importer;
-    
-    
+       
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -183,12 +175,12 @@ int main()
 
         shader.setUniformVec3fv("u_ViewPosition", p_Camera.get_position());
         shader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
-        shader.setUniformVec3fv("u_Light.direction", lightCube.get_position_vector());
+        //shader.setUniformVec3fv("u_Light.direction", lightCube.get_position_vector());
 
-        // SpotLight
-        // shader.setUniformVec3fv("u_Spotlight.position", p_Camera.get_position());
-        // shader.setUniformVec3fv("u_Spotlight.direction", p_Camera.get_front());
-        //renderer.draw3D(shader, cube, bronze);
+        //SpotLight
+        shader.setUniformVec3fv("u_Spotlight.position", p_Camera.get_position());
+        shader.setUniformVec3fv("u_Spotlight.direction", p_Camera.get_front());
+        renderer.draw3D(shader, cube, bronze);
         for (Cube& cube : v_Cubes)
         {
             renderer.draw3D(shader, cube, bronze);
@@ -196,12 +188,13 @@ int main()
         //Transformations::translate3D(lightCube, dt * cos(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7, dt * sin(glfwGetTime()) * 7);
         
         lightShader.setUniformMat4f("u_ViewProjection", p_Camera.get_projection_view_matrix());
-        renderer.draw3D(lightShader, lightCube);
+        //renderer.draw3D(lightShader, lightCube);
         
         //std::printf("Camera: (%.2f, %.2f, %.2f)\n", p_Camera.get_position().x, p_Camera.get_position().y, p_Camera.get_position().z);
 
         updateDT();
-        std::cout << "FPS: " << 1/dt << std::endl;
+        //std::cout << "FPS: " << 1/dt << std::endl;
+        //std::cout << "Hello" << std::endl;
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
