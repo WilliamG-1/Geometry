@@ -14,6 +14,15 @@ struct Material{
     float shininess;
 };
 
+struct Color{
+    Color() : r(1), g(1), b(1), a(1) {}
+    Color(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
+    float r;
+    float g;
+    float b;
+    float a;
+};
+
 class Renderer
 {
 public:
@@ -21,7 +30,7 @@ public:
 
     void draw2D(Shader& shader, Shape2D& shape);
     void draw3D(Shader& shader, Shape3D& shape, Material material);
-    void draw3D(Shader& shader, Shape3D& shape);
+    void draw3D(Shader& shader, Shape3D& shape, Color color = Color());
 private:
 
 };

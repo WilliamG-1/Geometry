@@ -29,8 +29,10 @@ void Renderer::draw3D(Shader& shader, Shape3D& shape, Material material)
     glDrawElements(GL_TRIANGLES, shape.get_number_of_indices(), GL_UNSIGNED_INT, 0);
 }
 
-void Renderer::draw3D(Shader& shader, Shape3D& shape)
+void Renderer::draw3D(Shader& shader, Shape3D& shape, Color color)
 {
+    shader.setUniformVec4f("u_Color", color.r, color.g, color.b, color.a);
+
     shader.use_shader();
     shader.setUniformMat4f("u_Model", shape.get_model_matrix());
 

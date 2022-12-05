@@ -16,6 +16,8 @@ public:
     void setUniform1f(const char* uniformName, float value);
     void setUniformVec3fv(const char* uniformName, glm::vec3 vector);
     void setUniformVec3f(const char* uniformName, float x, float y, float z);
+    void setUniformVec4fv(const char* uniformName, glm::vec4 vector);
+    void setUniformVec4f(const char* uniformName, float v1, float v2, float v3, float v4);
     void setUniformMat4f(const char* uniformName, glm::mat4 matrix);
 private:
     unsigned int program = 0;

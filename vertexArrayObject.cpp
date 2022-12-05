@@ -49,6 +49,8 @@ void VertexArrayObject::set_vertex_attrib_pointer(float* data, int number_of_ele
 
 }
 
+
+
 void VertexArrayObject::bind()
 {
     glBindVertexArray(vao);

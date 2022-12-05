@@ -96,12 +96,12 @@ void main()
     vec3 diffusion = u_Spotlight.diffusion * diff * vec3(texture(u_Material.t_diffuse, TexCoords)); // Calculate Diffusion Vector
 
     // Specular Lighting
-    vec3 viewDirection = normalize(u_ViewPosition - FragPos);         // Calculate the direction vector pointing from surface of object to the camera
-    vec3 reflectDirection = reflect(-lightDirection, normal);         // Calculate the reflected direction vector pointing from the surface to outside
-    float spec = pow(max(dot(viewDirection, reflectDirection), 0.0f), u_Material.shininess);  // Specular lighting formula (Spec exponent increases intensity)
-    vec3 specular = u_Spotlight.specular * spec * vec3(texture(u_Material.t_specular, TexCoords)); // Calculate specular vector
+    // vec3 viewDirection = normalize(u_ViewPosition - FragPos);         // Calculate the direction vector pointing from surface of object to the camera
+    // vec3 reflectDirection = reflect(-lightDirection, normal);         // Calculate the reflected direction vector pointing from the surface to outside
+    // float spec = pow(max(dot(viewDirection, reflectDirection), 0.0f), u_Material.shininess);  // Specular lighting formula (Spec exponent increases intensity)
+    // vec3 specular = u_Spotlight.specular * spec * vec3(texture(u_Material.t_specular, TexCoords)); // Calculate specular vector
 
-    vec3 result = attenuation * (2 * ambient + coneIntensity * (specular + diffusion));
+    vec3 result = 0.8 * (attenuation * (1.2 * ambient + coneIntensity * (diffusion)));
 
     FragColor = vec4(result, 1.0f);
     
